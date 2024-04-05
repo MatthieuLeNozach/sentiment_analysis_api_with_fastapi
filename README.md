@@ -235,3 +235,17 @@ API endpoints documentation (see below), and HTTP request templates are availabl
 ![alt text](<readme/1.png>)
 
 
+### **3.2 Natural Language Processing classifiers**
+
+#### **A. Sentiment: BERT model**
+This multilanguage pretrained model returns sentiment probabilities for 5 target labels (0 = very negative to 4 = very positive).  
+
+More information on the model [here](https://huggingface.co/nlptown/bert-base-multilingual-uncased-sentiment)
+
+
+#### **B. Emotion: Roberta base model**
+This pretrained model returns emotion probabilities for a total of 28 different emotions, the service selects the 5 most significant labels, returns their name and probability   
+
+More information on the model [here](https://huggingface.co/SamLowe/roberta-base-go_emotions)
+
+
