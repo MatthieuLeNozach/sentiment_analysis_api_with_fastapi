@@ -1,6 +1,5 @@
 # file: app/routers/admin.py
-"""
-Module: admin.py
+"""Module: admin.py.
 
 This module provides API endpoints for admin-related operations. It uses the FastAPI framework
 to define routes and handle HTTP requests. The module includes the following main components:
@@ -16,24 +15,26 @@ to define routes and handle HTTP requests. The module includes the following mai
   - `/users/{user_id}` (PUT): Endpoint to change user access rights (admin only).
   - `/users/{user_id}` (DELETE): Endpoint to delete a user (admin only).
 
-The module integrates with the `User` model 
+The module integrates with the `User` model
 and `ChangeUserAccessRights`, `ReadUser`, and `CreateAdmin`
-schemas for data validation and storage. 
+schemas for data validation and storage.
 It also uses the `get_current_user` dependency for authentication.
 
 Password hashing is performed using the `bcrypt` algorithm through the `CryptContext` class from
 the `passlib` library.
 """
+
 # pylint: disable=w0612
 from typing import Annotated, List
+
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, status
 from pydantic import ValidationError
-from fastapi import Depends, status, HTTPException, Path, APIRouter, Body
 from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..models import User
-from ..schemas import ChangeUserAccessRights, ReadUser, CreateAdmin
-from .auth import get_current_user, bcrypt_context
+from ..schemas import ChangeUserAccessRights, CreateAdmin, ReadUser
+from .auth import bcrypt_context, get_current_user
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -46,18 +47,21 @@ user_dependency = Annotated[dict, Depends(get_current_user)]
 ############### ROUTES ###############
 @router.get("/users", status_code=status.HTTP_200_OK, response_model=List[ReadUser])
 async def get_all_users(user: user_dependency, db: db_dependency) -> list:
-    """
-    Retrieves all users (admin only).
+    """Retrieve all users (admin only).
 
     Args:
+    ----
         user: The authenticated user (admin only).
         db: The database session.
 
     Returns:
+    -------
         A list of all users.
 
     Raises:
+    ------
         HTTPException: If the user is not authenticated or not an admin.
+
     """
     if user is None or user.get("role") != "admin":
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
@@ -66,18 +70,21 @@ async def get_all_users(user: user_dependency, db: db_dependency) -> list:
 
 @router.post("/create", status_code=status.HTTP_201_CREATED)
 async def create_admin(db: db_dependency, create_user_request: CreateAdmin) -> None:
-    """
-    Creates a new admin user.
+    """Create a new admin user.
 
     Args:
+    ----
         db: The database session.
         create_user_request: The request data for creating an admin user.
 
     Returns:
+    -------
         None
 
     Raises:
+    ------
         ValidationError: If the request data is invalid.
+
     """
     try:
         CreateAdmin.parse_obj(create_user_request.dict())
@@ -100,30 +107,31 @@ async def change_user_access_rights(
     user_id: int = Path(gt=0),
     access_rights: ChangeUserAccessRights = Body(...),
 ) -> None:
-    """
-    Changes the access rights of a user (admin only).
+    """Change the access rights of a user (admin only).
 
     Args:
+    ----
         user: The authenticated user (admin only).
         db: The database session.
         user_id: The ID of the user to modify.
         access_rights: The new access rights for the user.
 
     Returns:
+    -------
         None
 
     Raises:
+    ------
         HTTPException: If the user is not authenticated,
         not an admin, or the user to modify is not found.
+
     """
     if user is None or user.get("role") != "admin":
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
     modified_user = db.query(User).filter(User.id == user_id).first()
     if modified_user is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     modified_user.is_active = access_rights.is_active
     modified_user.has_access_sentiment = access_rights.has_access_sentiment
     modified_user.has_access_emotion = access_rights.has_access_emotion
@@ -133,27 +141,28 @@ async def change_user_access_rights(
 
 
 @router.delete("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_user(
-    user: user_dependency, db: db_dependency, user_id: int = Path(gt=0)
-) -> None:
-    """
-    Deletes a user (admin only).
+async def delete_user(user: user_dependency, db: db_dependency, user_id: int = Path(gt=0)) -> None:
+    """Delete a user (admin only).
 
     Args:
+    ----
         user: The authenticated user (admin only).
         db: The database session.
         user_id: The ID of the user to delete.
 
     Returns:
+    -------
         None
 
     Raises:
+    ------
         HTTPException: If the user is not authenticated or not an admin.
+
     """
     if user is None or user.get("role") != "admin":
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication failed"
         )
 
-    user_model = db.query(User).filter(User.id == user_id).delete()
+    db.query(User).filter(User.id == user_id).delete()
     db.commit()

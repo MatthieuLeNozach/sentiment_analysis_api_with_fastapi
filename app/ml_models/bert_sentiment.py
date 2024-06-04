@@ -1,6 +1,5 @@
 # File: ml_models/bert_sentiment.py
-"""
-Module: bert_sentiment.py
+"""Module: bert_sentiment.py.
 
 This module contains the BERTSentimentAnalyzer class, which is a PyTorch module for performing
 sentiment analysis using the BERT (Bidirectional Encoder Representations from Transformers) model.
@@ -23,10 +22,11 @@ Dependencies:
 Constants:
 - MODEL_LOC: The location or identifier of the pre-trained BERT model for sentiment analysis.
 """
+
 # pylint: disable=w0223
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch.nn as nn
 import torch.nn.functional as F
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 from ..schemas import PredictionInput, PredictionOutputSentiment
 from .nlp_utils import TextPreprocessor
@@ -36,26 +36,25 @@ MODEL_LOC = "nlptown/bert-base-multilingual-uncased-sentiment"
 
 
 class BERTSentimentAnalyzer(nn.Module):
-    """
-    A PyTorch module for performing sentiment analysis using the BERT model.
+    """A PyTorch module for performing sentiment analysis using the BERT model.
 
     This class loads a pre-trained BERT model and tokenizer for sentiment analysis.
     It preprocesses the input text using the TextPreprocessor module and then passes
     the tokenized text through the BERT model to obtain sentiment scores.
 
-    Attributes:
+    Attributes
+    ----------
         loaded (bool): Indicates whether the model and tokenizer are loaded.
         preprocessor (TextPreprocessor):
         An instance of the TextPreprocessor module for text preprocessing.
         tokenizer (AutoTokenizer): The tokenizer for the BERT model.
         model (AutoModelForSequenceClassification):
         The pre-trained BERT model for sentiment analysis.
+
     """
 
     def __init__(self):
-        """
-        Initializes the BERTSentimentAnalyzer module.
-        """
+        """Initialize the BERTSentimentAnalyzer module."""
         super().__init__()
         self.loaded = False
         self.preprocessor = TextPreprocessor()
@@ -63,24 +62,22 @@ class BERTSentimentAnalyzer(nn.Module):
         self.model = None
 
     async def load_model(self):
-        """
-        Loads the pre-trained BERT model and tokenizer.
-        """
+        """Load the pre-trained BERT model and tokenizer."""
         self.tokenizer = AutoTokenizer.from_pretrained(MODEL_LOC)
         self.model = AutoModelForSequenceClassification.from_pretrained(MODEL_LOC)
         self.loaded = True
 
-    async def predict(
-        self, prediction_input: PredictionInput
-    ) -> PredictionOutputSentiment:
-        """
-        Performs sentiment analysis on the input text.
+    async def predict(self, prediction_input: PredictionInput) -> PredictionOutputSentiment:
+        """Perform sentiment analysis on the input text.
 
         Args:
-            input (PredictionInput): The input text for sentiment analysis.
+        ----
+            prediction_input (PredictionInput): The input text for sentiment analysis.
 
         Returns:
+        -------
             PredictionOutputSentiment: The sentiment scores for each class (0 to 4).
+
         """
         if not self.loaded:
             await self.load_model()

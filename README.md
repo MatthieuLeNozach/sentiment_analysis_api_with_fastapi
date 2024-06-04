@@ -97,7 +97,7 @@ conda activate fastapi_nlp
 
 # Installation of required packages from the requirements file
 conda install --file requirements.txt
-``` 
+```
 
 ### **Alternative: Mount project as a DevContainer in VSCode**
 
@@ -121,12 +121,12 @@ chmod +x run.sh
 ## **Getting started** <a name="getting-started"></a>
 
 ### **A. Securize the project**
-- **Add `.environment` folder to the `.gitignore` file** to stop exposing sensitive information to git commits 
-- **Access the `.environment` folder** from repository root, the folder may be hidden. 
+- **Add `.environment` folder to the `.gitignore` file** to stop exposing sensitive information to git commits
+- **Access the `.environment` folder** from repository root, the folder may be hidden.
 ```bash
 nano .environment/env.dev
 
-nano .environment/env.test 
+nano .environment/env.test
 ```
 
 - **Replace the dummy secret keys with your own keys**. You can generate base64 secrets with this command:
@@ -225,7 +225,7 @@ To achieve separation of concerns and improved code organization, endpoints and 
 - **auth** router file for registration / security related helpers and endpoint functions (see below)
 - **admin** router file for admin specific actions, like grant/revoke access rights, delete user
 - **user** router file for user specific actions (change password, #TODO get service call history)
-- **bert_sentiment** 
+- **bert_sentiment**
 - **roberta_emotion**
 
 #### **B. Endpoints**
@@ -244,8 +244,6 @@ More information on the model [here](https://huggingface.co/nlptown/bert-base-mu
 
 
 #### **B. Emotion: Roberta base model**
-This pretrained model returns emotion probabilities for a total of 28 different emotions, the service selects the 5 most significant labels, returns their name and probability   
+This pretrained model returns emotion probabilities for a total of 28 different emotions, the service selects the 5 most significant labels, returns their name and probability  
 
 More information on the model [here](https://huggingface.co/SamLowe/roberta-base-go_emotions)
-
-

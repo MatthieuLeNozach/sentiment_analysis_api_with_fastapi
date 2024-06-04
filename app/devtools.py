@@ -1,6 +1,5 @@
 # file: app/dev_tools.py
-"""
-Module: dev_tools.py
+"""Module: dev_tools.py.
 
 This module provides development utility functions for managing superuser accounts
 in the application. It includes functions to create and remove a superuser account
@@ -30,27 +29,30 @@ manage superuser accounts in a production setup.
 Dependencies:
 - `sqlalchemy.orm.Session`: The SQLAlchemy Session class for database operations.
 - `models.User`: The User model class representing the user table in the database.
-- `passlib.context.CryptContext`: The password hashing context from the `passlib` library.
+- `passlib.context.CryptContext`: The password hashing context from the `passlib` lib.
 """
-from sqlalchemy.orm import Session
-from .models import User
-from passlib.context import CryptContext
 
+from passlib.context import CryptContext
+from sqlalchemy.orm import Session
+
+from .models import User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def create_superuser(db: Session):
-    """
-    Creates a superuser in the database.
+    """Create a superuser in the database.
 
     Args:
+    ----
         db (Session): The database session.
 
     Returns:
+    -------
         None
 
     Notes:
+    -----
         - This function creates a superuser with predefined credentials and permissions.
         - The superuser has the username 'superuser@example.com' and password '8888'.
         - The superuser is assigned the 'admin' role and has access to both v1 and v2.
@@ -58,6 +60,7 @@ def create_superuser(db: Session):
     Example usage:
         db = SessionLocal()
         create_superuser(db)
+
     """
     superuser = User(
         username="superuser@example.com",
@@ -74,22 +77,25 @@ def create_superuser(db: Session):
 
 
 def remove_superuser(db: Session):
-    """
-    Removes the superuser from the database.
+    """Remove the superuser from the database.
 
     Args:
+    ----
         db (Session): The database session.
 
     Returns:
+    -------
         None
 
     Notes:
+    -----
         - This function removes the superuser with the username 'superuser@example.com' from the database.
         - It deletes the superuser record and commits the changes to the database.
 
     Example usage:
         db = SessionLocal()
         remove_superuser(db)
+
     """
     db.query(User).filter(User.username == "superuser@example.com").delete()
     db.commit()

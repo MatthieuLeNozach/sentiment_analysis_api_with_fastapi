@@ -1,6 +1,5 @@
 # file: app/models.py
-"""
-Module: models.py
+"""Module: models.py.
 
 This module defines the database models for the application using SQLAlchemy ORM.
 It includes the following models:
@@ -16,8 +15,10 @@ It includes the following models:
      - hashed_password: The hashed password of the user.
      - is_active: Indicates whether the user is active.
      - role: The role of the user.
-     - has_access_sentiment: Indicates whether the user has access to BERT sentiment analyzer model.
-     - has_access_emotion: Indicates whether the user has access to version RoBERTa emotion analyzer model.
+     - has_access_sentiment: Indicates whether the user
+          has access to BERT sentiment analyzer model.
+     - has_access_emotion: Indicates whether the user
+        has access to version RoBERTa emotion analyzer model.
    - Relationships:
      - service_calls: The service calls associated with the user.
 
@@ -44,18 +45,19 @@ where each user can have multiple service calls associated with them.
 Note: Make sure to run the necessary database migrations or create the corresponding
 tables in the database based on these model definitions.
 """
-from sqlalchemy import Float, Integer, String, Boolean, ForeignKey, DateTime
-from sqlalchemy.sql import func
+
+from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.sql import func
 
 from .database import Base
 
 
 class User(Base):
-    """
-    Represents a user in the system.
+    """Represents a user in the system.
 
-    Attributes:
+    Attributes
+    ----------
         id (int): The unique identifier of the user.
         username (str): The username of the user.
         first_name (str): The first name of the user.
@@ -64,11 +66,14 @@ class User(Base):
         hashed_password (str): The hashed password of the user.
         is_active (bool): Indicates whether the user is active.
         role (str): The role of the user.
-        has_access_sentiment (bool): Indicates whether the user has access to sentiment analyzer model.
-        has_access_emotion (bool): Indicates whether the user has access to emotion analyzer model.
+        has_access_sentiment (bool): Indicates whether the user
+            has access to sentiment analyzer model.
+        has_access_emotion (bool): Indicates whether the user
+            has access to emotion analyzer model.
         service_calls (list): The service calls associated with the user.
 
-    Methods:
+    Methods
+    -------
         __init__(self, **kwargs): Initializes a new instance of the User class.
 
     """
@@ -89,10 +94,10 @@ class User(Base):
 
 
 class ServiceCall(Base):
-    """
-    Represents a service call made by a user.
+    """Represents a service call made by a user.
 
-    Attributes:
+    Attributes
+    ----------
         id (str): The unique identifier of the service call.
         service_version (str): The version of the service called.
         success (bool): Indicates whether the service call was successful.
@@ -102,7 +107,8 @@ class ServiceCall(Base):
         duration (float): The duration of the service call in seconds.
         user (User): The user associated with the service call.
 
-    Methods:
+    Methods
+    -------
         __init__(self, **kwargs): Initializes a new instance of the ServiceCall class.
 
     """

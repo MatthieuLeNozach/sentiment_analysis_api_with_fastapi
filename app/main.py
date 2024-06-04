@@ -1,6 +1,5 @@
 # file: app/main.py
-"""
-Module: main.py
+"""Module: main.py.
 
 This module serves as the entry point for the FastAPI application. It sets up the
 API routes, database connection, and handles the application's lifespan events.
@@ -35,16 +34,18 @@ function from the `python-dotenv` library.
 Note: Make sure to have the necessary environment variables set up in the `.environment`
 folder for the application to function properly.
 """
+
 import os
+
 from dotenv import load_dotenv
 from fastapi import FastAPI
 
+from .database import SessionLocal, engine
+from .devtools import create_superuser, remove_superuser
 from .ml_models.bert_sentiment import BERTSentimentAnalyzer
 from .ml_models.roberta_emotion import RobertaEmotionAnalyzer
 from .models import Base
-from .database import engine, SessionLocal
-from .routers import auth, admin, bert_sentiment, users, roberta_emotion
-from .devtools import create_superuser, remove_superuser
+from .routers import admin, auth, bert_sentiment, roberta_emotion, users
 
 load_dotenv(override=True)  # loads environment variables from the .environment folder
 
@@ -68,8 +69,7 @@ Base.metadata.create_all(bind=engine)
 ############### LIFESPAN ###############
 @app.on_event("startup")
 async def startup_event():
-    """
-    Startup event handler for the FastAPI application.
+    """Startup event handler for the FastAPI application.
 
     This function is called when the application starts up. It performs the following tasks:
     1. If the environment variable "CREATE_SUPERUSER" is set to a truthy value,
@@ -77,11 +77,14 @@ async def startup_event():
     2. Loads the machine learning models for version 1 and version 2 using the `load_model` method
        of the respective model instances.
 
-    Returns:
+    Returns
+    -------
         None
 
-    Raises:
+    Raises
+    ------
         None
+
     """
     if os.getenv("CREATE_SUPERUSER", "False").lower() in ["true", "1", "yes"]:
         db = SessionLocal()
@@ -94,18 +97,20 @@ async def startup_event():
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    """
-    Shutdown event handler for the FastAPI application.
+    """Shutdown event handler for the FastAPI application.
 
     This function is called when the application shuts down. It performs the following task:
     1. If the environment variable "CREATE_SUPERUSER" is set to a truthy value,
     it removes the superuser from the database using the `remove_superuser` function.
 
-    Returns:
+    Returns
+    -------
         None
 
-    Raises:
+    Raises
+    ------
         None
+
     """
     if os.getenv("CREATE_SUPERUSER", "False").lower() in ["true", "1", "yes"]:
         db = SessionLocal()
@@ -116,17 +121,19 @@ async def shutdown_event():
 ############### ROUTES ###############
 @app.get("/healthcheck")
 def get_healthcheck():
-    """
-    Healthcheck endpoint to check the status of the application.
+    """Healthcheck endpoint to check the status of the application.
 
     This function is used to check the health status of the FastAPI application. It returns a JSON
     response indicating that the application is healthy.
 
-    Returns:
+    Returns
+    -------
         dict: A dictionary containing the health status of the application.
             - "status" (str): The status of the application, which is always "healthy".
 
-    Raises:
+    Raises
+    ------
         None
+
     """
     return {"status": "healthy"}

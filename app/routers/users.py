@@ -1,6 +1,5 @@
 # file: users.py
-"""
-Module: users.py
+"""Module: users.py.
 
 This module provides API endpoints for user-related operations. It uses the FastAPI framework
 to define routes and handle HTTP requests. The module includes the following main components:
@@ -22,13 +21,14 @@ the `passlib` library.
 """
 
 from typing import Annotated
-from sqlalchemy.orm import Session
-from fastapi import APIRouter, status, HTTPException, Depends
-from passlib.context import CryptContext
 
-from ..models import User
-from ..schemas import UserVerification, ReadUser
+from fastapi import APIRouter, Depends, HTTPException, status
+from passlib.context import CryptContext
+from sqlalchemy.orm import Session
+
 from ..database import get_db
+from ..models import User
+from ..schemas import ReadUser, UserVerification
 from .auth import get_current_user
 
 router = APIRouter(prefix="/user", tags=["user"])
@@ -42,18 +42,21 @@ bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 ############### ROUTES ###############
 @router.get("/", status_code=status.HTTP_200_OK, response_model=ReadUser)
 async def get_user(user: user_dependency, db: db_dependency) -> User:
-    """
-    Endpoint to retrieve the current user's information.
+    """Retrieve the current user's information.
 
     Args:
+    ----
         user: The authenticated user dependency.
         db: The database session dependency.
 
     Returns:
+    -------
         User: The current user's information.
 
     Raises:
+    ------
         HTTPException: If the user is not authenticated.
+
     """
     if user is None:
         raise HTTPException(
@@ -66,19 +69,22 @@ async def get_user(user: user_dependency, db: db_dependency) -> User:
 async def change_password(
     user: user_dependency, db: db_dependency, user_verification: UserVerification
 ) -> None:
-    """
-    Endpoint to change the user's password.
+    """Change the user's password.
 
     Args:
+    ----
         user: The authenticated user dependency.
         db: The database session dependency.
         user_verification: The UserVerification schema containing the current and new passwords.
 
     Returns:
+    -------
         None
 
     Raises:
+    ------
         HTTPException: If the user is not authenticated or if the current password is incorrect.
+
     """
     if user is None:
         raise HTTPException(
@@ -86,9 +92,9 @@ async def change_password(
         )
 
     user_model = db.query(User).filter(User.id == user.get("id")).first()
-    if not bcrypt_context.verify(
-        user_verification.password, user_model.hashed_password
-    ):
+    if user_model is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+    if not bcrypt_context.verify(user_verification.password, user_model.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Error on password change"
         )

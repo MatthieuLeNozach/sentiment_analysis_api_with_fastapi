@@ -1,6 +1,5 @@
 # File: ml_models/roberta_emotion.py
-"""
-Module: roberta_emotion.py
+"""Module: roberta_emotion.py.
 
 This module contains the RobertaEmotionAnalyzer class, which is a PyTorch module for performing
 emotion analysis using the RoBERTa (Robustly Optimized BERT Pretraining Approach) model.
@@ -23,38 +22,44 @@ Dependencies:
 Constants:
 - MODEL_LOC: The location or identifier of the pre-trained RoBERTa model for emotion analysis.
 """
+
 # pylint: disable=w0223
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 from ..schemas import PredictionInput, PredictionOutputEmotion
 from .nlp_utils import TextPreprocessor
-
 
 # BERT OneHot 5-class sentiment classifier
 MODEL_LOC = "SamLowe/roberta-base-go_emotions"
 
 
 class RobertaEmotionAnalyzer(nn.Module):
-    """
-    A PyTorch module for performing emotion analysis using the RoBERTa model.
+    """A PyTorch module for performing emotion analysis using the RoBERTa model.
 
     This class loads a pre-trained RoBERTa model and tokenizer for emotion analysis.
     It preprocesses the input text using the TextPreprocessor module and then passes
     the tokenized text through the RoBERTa model to obtain emotion scores.
 
-    Attributes:
+    Attributes
+    ----------
         loaded (bool): Indicates whether the model and tokenizer are loaded.
         preprocessor (TextPreprocessor):
         An instance of the TextPreprocessor module for text preprocessing.
         tokenizer (AutoTokenizer): The tokenizer for the RoBERTa model.
         model (AutoModelForSequenceClassification):
         The pre-trained RoBERTa model for emotion analysis.
+
     """
 
     def __init__(self) -> None:
+        """Initialize the RobertaEmotionAnalyzer class.
+
+        This method sets the initial values for the loaded, preprocessor, tokenizer, and model attributes.
+
+        """
         super().__init__()
         self.loaded = False
         self.preprocessor = TextPreprocessor()
@@ -62,24 +67,22 @@ class RobertaEmotionAnalyzer(nn.Module):
         self.model = None
 
     async def load_model(self) -> None:
-        """
-        Loads the pre-trained RoBERTa model and tokenizer.
-        """
+        """Load the pre-trained RoBERTa model and tokenizer."""
         self.tokenizer = AutoTokenizer.from_pretrained(MODEL_LOC)
         self.model = AutoModelForSequenceClassification.from_pretrained(MODEL_LOC)
         self.loaded = True
 
-    async def predict(
-        self, prediction_input: PredictionInput
-    ) -> PredictionOutputEmotion:
-        """
-        Performs emotion analysis on the input text.
+    async def predict(self, prediction_input: PredictionInput) -> PredictionOutputEmotion:
+        """Perform emotion analysis on the input text.
 
         Args:
+        ----
             prediction_input (PredictionInput): The input text for emotion analysis.
 
         Returns:
+        -------
             PredictionOutputEmotion: The top 5 emotions with their corresponding scores.
+
         """
         if not self.loaded:
             await self.load_model()

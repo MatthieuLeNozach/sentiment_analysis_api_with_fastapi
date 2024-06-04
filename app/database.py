@@ -1,6 +1,5 @@
 # file: app/database.py
-"""
-Module: database.py
+"""Module: database.py.
 
 This module provides the database configuration and setup for the application.
 It uses SQLAlchemy as the ORM (Object-Relational Mapping) library to interact
@@ -8,7 +7,8 @@ with the database.
 
 The module includes the following main components:
 
-- `SQLALCHEMY_DATABASE_URL`: The database connection URL obtained from the environment variable "SQL_URL".
+`SQLALCHEMY_DATABASE_URL`: The database connection URL obtained from the env variable "SQL_URL".
+SQLALCHEMY_DATABASE_URL = os.environ["SQL_URL"]
 - `engine`: The SQLAlchemy engine instance created based on the database URL.
 - `SessionLocal`: The sessionmaker factory used to create database sessions.
 - `Base`: The declarative base class for defining database models.
@@ -24,11 +24,11 @@ The `get_db` function is used as a dependency in FastAPI routes to provide a dat
 session to the route handlers. It ensures that the session is properly closed after
 each request.
 """
+
 import os
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
-
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 SQLALCHEMY_DATABASE_URL = os.environ["SQL_URL"]
 
@@ -36,9 +36,7 @@ SQLALCHEMY_DATABASE_URL = os.environ["SQL_URL"]
 # engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 # add connect_args={'check_same_thread': False} when using sqlite
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-)
+engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -46,13 +44,14 @@ Base = declarative_base()
 
 
 def get_db():
-    """
-    Dependency function to get a database session.
+    """Dependency function to get a database session.
 
-    Yields:
+    Yields
+    ------
         db (Session): A database session.
 
-    Notes:
+    Notes
+    -----
         - This function is used as a dependency in FastAPI routes to provide a database session.
         - It creates a new database session using `SessionLocal` and yields it.
         - The session is automatically closed after the request is processed.
@@ -62,6 +61,7 @@ def get_db():
         def get_users(db: Session = Depends(get_db)):
             users = db.query(User).all()
             return users
+
     """
     db = SessionLocal()
     try:

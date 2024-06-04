@@ -1,8 +1,7 @@
 # file: app/schemas.py
-"""
-Module: schemas.py
+"""Module: schemas.py.
 
-This module defines the Pydantic schemas used 
+This module defines the Pydantic schemas used
 for data validation and serialization in the application.
 The schemas serve as a layer between the API requests/responses and the database models, ensuring
 that the data exchanged through the API conforms to the defined structure and constraints.
@@ -25,7 +24,7 @@ TokenData: Defines the fields for the data embedded in the access token.
 Prediction Schemas:
 
 PredictionInput: Represents the schema for the input data required for making predictions.
-PredictionOutputSentiment / PredictionOutputEmotion: Represents the schema for the output data 
+PredictionOutputSentiment / PredictionOutputEmotion: Represents the schema for the output data
 returned from the prediction endpoints.
 Service Call Schemas:
 
@@ -43,9 +42,11 @@ Note: The Config class within some schemas, such as BaseUser and ServiceCallCrea
 to specify additional configuration options for the schema, such as allowing the creation of schema
 instances from arbitrary attribute values.
 """
+
 # pylint: disable=c0115
-from datetime import timedelta, datetime
-from typing import Optional, List, Tuple
+from datetime import datetime, timedelta
+from typing import List, Optional, Tuple
+
 from pydantic import BaseModel, EmailStr, Field
 
 

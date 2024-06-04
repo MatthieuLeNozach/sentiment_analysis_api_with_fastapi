@@ -1,9 +1,8 @@
 # file: app/routers/ml_service_bert_sentiment.py
-"""
-Module: ml_service_bert_sentiment.py
+"""Module: ml_service_bert_sentiment.py.
 
-This module provides API endpoints for a sentiment analysis service using the BERT model. 
-It uses the FastAPI framework to define routes and handle HTTP requests. 
+This module provides API endpoints for a sentiment analysis service using the BERT model.
+It uses the FastAPI framework to define routes and handle HTTP requests.
 he module includes the following main components:
 
 - Dependencies:
@@ -12,9 +11,9 @@ he module includes the following main components:
   - `get_model_bert_sentiment`: Dependency function to lazy-load the BERT sentiment analysis model.
 
 - Helper Functions:
-  - `make_prediction_helper`: Helper function to make predictions 
+  - `make_prediction_helper`: Helper function to make predictions
      using the loaded BERT model and handle service call logging.
-  - `interpret_results`: Helper function to interpret the raw prediction output 
+  - `interpret_results`: Helper function to interpret the raw prediction output
      and return a more user-friendly result.
 
 - Routes:
@@ -22,26 +21,28 @@ he module includes the following main components:
   - `/predict/raw`: Endpoint to make raw predictions using the loaded BERT model.
   - `/predict/interpreted`: Endpoint to make predictions and return interpreted results.
 
-The module integrates with the `BERTSentimentAnalyzer` class 
+The module integrates with the `BERTSentimentAnalyzer` class
 from the `ml_models.bert_sentiment` module to
-load and use the BERT model for sentiment analysis. 
+load and use the BERT model for sentiment analysis.
 It uses the `ServiceCall`, `PredictionInput`, and `PredictionOutputSentiment`
 models and schemas for data validation and storage.
 
 Authentication and authorization are handled using the `get_current_user` dependency, which verifies
 the user's access rights to the sentiment analysis service endpoints.
 
-The module follows a modular structure and uses dependency injection 
+The module follows a modular structure and uses dependency injection
 to promote code reusability and maintainability.
 """
+
 from datetime import datetime
 from typing import Annotated
-from fastapi import Depends, status, HTTPException, APIRouter
-from sqlalchemy.orm import Session
-import numpy as np
 
+import numpy as np
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
 
 from ..database import get_db
+from ..ml_models.bert_sentiment import BERTSentimentAnalyzer
 from ..models import ServiceCall
 from ..schemas import (
     PredictionInput,
@@ -49,7 +50,6 @@ from ..schemas import (
     PredictionOutputSentiment,
     ServiceCallCreate,
 )
-from ..ml_models.bert_sentiment import BERTSentimentAnalyzer
 from .auth import get_current_user
 
 router = APIRouter(prefix="/mlservice/sentiment", tags=["mlservice/sentiment"])
@@ -61,14 +61,16 @@ bert_sentiment_analyzer = BERTSentimentAnalyzer()
 async def get_model_bert_sentiment(
     model: BERTSentimentAnalyzer = Depends(),
 ) -> BERTSentimentAnalyzer:
-    """
-    Dependency function to lazy-load the ML model.
+    """Dependency function to lazy-load the ML model.
 
     Args:
+    ----
         model: The BERTSentimentAnalyzer instance to be loaded.
 
     Returns:
+    -------
         The loaded BERTSentimentAnalyzer instance.
+
     """
     if not model.loaded:
         await model.load_model()
@@ -78,9 +80,7 @@ async def get_model_bert_sentiment(
 # pylint: disable=c0103
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]
-bert_sentiment_dependency = Annotated[
-    BERTSentimentAnalyzer, Depends(get_model_bert_sentiment)
-]  # pylint: enable=c0103
+bert_sentiment_dependency = Annotated[BERTSentimentAnalyzer, Depends(get_model_bert_sentiment)]  # pylint: enable=c0103
 
 
 ############### HELPERS ###############
@@ -90,25 +90,26 @@ async def make_prediction_helper(
     db: db_dependency,
     model: bert_sentiment_dependency,
 ) -> PredictionOutput:
-    """
-    Helper function to make predictions using the loaded BERT model and handle service call logging.
+    """Help make predictions using the loaded BERT model and handle service call logging.
 
     Args:
+    ----
         prediction_input (PredictionInput): The input data for the prediction.
         user (user_dependency): The authenticated user making the request.
         db (db_dependency): The database session.
         model (bert_sentiment_dependency): The loaded BERT sentiment analysis model.
 
     Raises:
+    ------
         HTTPException: If the user is not authenticated or does not have access to the service.
 
     Returns:
+    -------
         PredictionOutputSentiment: The prediction output from the BERT model.
+
     """
     if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="User is None"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User is None")
 
     if not user.get("has_access_sentiment"):
         raise HTTPException(
@@ -138,15 +139,16 @@ async def make_prediction_helper(
 
 
 def interpret_results(prediction_output: PredictionOutputSentiment) -> dict:
-    """
-    Interprets the raw prediction output and returns a user-friendly result.
+    """Interprets the raw prediction output and returns a user-friendly result.
 
     Args:
-        prediction_output (PredictionOutputSentiment):
-        The raw prediction output from the BERT model.
+    ----
+        prediction_output (PredictionOutputSentiment): The raw prediction output from the BERT model.
 
     Returns:
+    -------
         dict: A dictionary containing the predicted sentiment label and probability.
+
     """
     sentiment_labels = {
         0: "Very Negative",
@@ -170,21 +172,22 @@ def interpret_results(prediction_output: PredictionOutputSentiment) -> dict:
 
 ############### ROUTES ###############
 @router.get("/healthcheck", status_code=status.HTTP_200_OK)
-async def check_service_bert_sentiment(
-    user: user_dependency, db: db_dependency
-) -> dict:
-    """
-    Endpoint to check the health status of the sentiment analysis service.
+async def check_service_bert_sentiment(user: user_dependency, db: db_dependency) -> dict:
+    """Check the health status of the sentiment analysis service.
 
     Args:
+    ----
         user (user_dependency): The authenticated user making the request.
         db (db_dependency): The database session.
 
     Raises:
+    ------
         HTTPException: If the user is not authenticated or does not have access to the service.
 
     Returns:
+    -------
         dict: A dictionary indicating the health status of the service.
+
     """
     if user is None or not user.get("has_access_bert_sentiment"):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
@@ -198,19 +201,20 @@ async def make_prediction_raw(
     db: db_dependency,
     model: bert_sentiment_dependency,
 ) -> PredictionOutput:
-    """
-    Endpoint to make raw predictions using the loaded BERT model.
+    """Endpoint to make raw predictions using the loaded BERT model.
 
     Args:
+    ----
         prediction_input (PredictionInput): The input data for the prediction.
         user (user_dependency): The authenticated user making the request.
         db (db_dependency): The database session.
         model (bert_sentiment_dependency): The loaded BERT sentiment analysis model.
 
     Returns:
+    -------
         PredictionOutputSentiment: The raw prediction output from the BERT model.
-    """
 
+    """
     prediction_output = await make_prediction_helper(prediction_input, user, db, model)
     return prediction_output
 
@@ -222,17 +226,19 @@ async def make_prediction_interpreted(
     db: db_dependency,
     model: bert_sentiment_dependency,
 ) -> dict:
-    """
-    Endpoint to make predictions and return interpreted results.
+    """Endpoint to make predictions and return interpreted results.
 
     Args:
+    ----
         prediction_input (PredictionInput): The input data for the prediction.
         user (user_dependency): The authenticated user making the request.
         db (db_dependency): The database session.
         model (bert_sentiment_dependency): The loaded BERT sentiment analysis model.
 
     Returns:
+    -------
         dict: A dictionary containing the predicted sentiment label and probability.
+
     """
     prediction_output = await make_prediction_helper(prediction_input, user, db, model)
     interpreted_results = interpret_results(prediction_output)

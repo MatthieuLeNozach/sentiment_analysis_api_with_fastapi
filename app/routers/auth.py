@@ -1,6 +1,5 @@
 # file: app/routers/auth.py
-"""
-Module: auth.py
+"""Module: auth.py.
 
 This module provides authentication-related functionality for the API. It uses the FastAPI framework
 to define routes and handle HTTP requests. The module includes the following main components:
@@ -20,19 +19,20 @@ to define routes and handle HTTP requests. The module includes the following mai
 The module integrates with the `User` model and `Token` schema for data validation and storage.
 It uses the `oauth2_scheme` for handling OAuth2 authentication and JWT for token generation.
 
-Password hashing and verification are performed 
+Password hashing and verification are performed
 using the `bcrypt` algorithm through the `CryptContext`
 class from the `passlib` library.
 """
+
 import os
 from datetime import datetime, timedelta
 from typing import Annotated, Optional
-from pydantic import ValidationError
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import jwt
 from passlib.context import CryptContext
+from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from ..database import get_db
@@ -57,16 +57,18 @@ oauth2bearer = OAuth2PasswordBearer(tokenUrl="auth/token")
 # pylint: enable=c0103
 ############### FUNCTIONS ###############
 def authenticate_user(username: str, password: str, db) -> Optional[User]:
-    """
-    Authenticates a user based on the provided username and password.
+    """Authenticate a user based on the provided username and password.
 
     Args:
+    ----
         username: The username of the user.
         password: The password of the user.
         db: The database session.
 
     Returns:
+    -------
         The authenticated user if the credentials are valid, False otherwise.
+
     """
     user = db.query(User).filter(User.username == username).first()
     if not user:
@@ -78,14 +80,16 @@ def authenticate_user(username: str, password: str, db) -> Optional[User]:
 
 
 def create_access_token(token_data: TokenData) -> str:
-    """
-    Creates an access token based on the provided token data.
+    """Create an access token based on the provided token data.
 
     Args:
+    ----
         token_data: The data to be included in the access token.
 
     Returns:
+    -------
         The generated access token.
+
     """
     encode = token_data.dict()
     expires = datetime.utcnow() + token_data.expires_delta
@@ -95,17 +99,20 @@ def create_access_token(token_data: TokenData) -> str:
 
 
 async def get_current_user(token: Annotated[str, Depends(oauth2bearer)]) -> dict:
-    """
-    Retrieves the current user based on the provided access token.
+    """Retrieve the current user based on the provided access token.
 
     Args:
+    ----
         token: The access token.
 
     Returns:
+    -------
         A dictionary containing the user's information.
 
     Raises:
+    ------
         HTTPException: If the user cannot be validated.
+
     """
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -136,18 +143,21 @@ async def get_current_user(token: Annotated[str, Depends(oauth2bearer)]) -> dict
 ############### ROUTES ###############
 @router.post("/create", status_code=status.HTTP_201_CREATED)
 async def create_user(db: db_dependency, create_user_request: CreateUser) -> None:
-    """
-    Creates a new user.
+    """Create a new user.
 
     Args:
+    ----
         db: The database session.
         create_user_request: The request data for creating a user.
 
     Returns:
+    -------
         None
 
     Raises:
+    ------
         ValidationError: If the request data is invalid.
+
     """
     try:
         CreateUser.parse_obj(create_user_request.dict())
@@ -176,18 +186,21 @@ async def create_user(db: db_dependency, create_user_request: CreateUser) -> Non
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency
 ) -> dict:
-    """
-    Generates an access token for the user upon successful login.
+    """Generate an access token for the user upon successful login.
 
     Args:
+    ----
         form_data: The login form data containing the username and password.
         db: The database session.
 
     Returns:
+    -------
         A dictionary containing the access token and token type.
 
     Raises:
+    ------
         HTTPException: If the user cannot be validated.
+
     """
     user = authenticate_user(form_data.username, form_data.password, db)
     if not user:
