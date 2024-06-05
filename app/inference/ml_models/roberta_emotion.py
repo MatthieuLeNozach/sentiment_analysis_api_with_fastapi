@@ -29,8 +29,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-from ..schemas import PredictionInput, PredictionOutputEmotion
-from .nlp_utils import TextPreprocessor
+from app_utils.schemas import PredictionInput, PredictionOutputEmotion
+from ml_models.nlp_utils import TextPreprocessor
 
 # BERT OneHot 5-class sentiment classifier
 MODEL_LOC = "SamLowe/roberta-base-go_emotions"

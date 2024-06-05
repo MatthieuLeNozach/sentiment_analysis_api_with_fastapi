@@ -34,11 +34,11 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from ..database import get_db
-from ..ml_models.roberta_emotion import RobertaEmotionAnalyzer
-from ..models import ServiceCall
-from ..schemas import PredictionInput, PredictionOutputEmotion, ServiceCallCreate
-from .auth import get_current_user
+from database import get_db
+from ml_models.roberta_emotion import RobertaEmotionAnalyzer
+from models import ServiceCall
+from app_utils.schemas import PredictionInput, PredictionOutputEmotion, ServiceCallCreate
+from auth import get_current_user
 
 router = APIRouter(prefix="/mlservice/emotion", tags=["mlservice/emotion"])
 
@@ -66,11 +66,9 @@ async def get_model_roberta_emotion(
     return model
 
 
-# pylint: disable=c0103
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]
 roberta_emotion_dependency = Annotated[RobertaEmotionAnalyzer, Depends(get_model_roberta_emotion)]
-# pylint: enable=c0103
 
 
 ############### ROUTES ###############
@@ -97,7 +95,6 @@ async def check_service_emotion(user: user_dependency, db: db_dependency) -> dic
     return {"status": "healthy"}
 
 
-# Define your routes here
 @router.post("/predict", status_code=status.HTTP_200_OK)
 async def make_prediction_emotion(
     prediction_input: PredictionInput,

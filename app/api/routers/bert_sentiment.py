@@ -41,10 +41,10 @@ import numpy as np
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from ..database import get_db
-from ..ml_models.bert_sentiment import BERTSentimentAnalyzer
-from ..models import ServiceCall
-from ..schemas import (
+from database import get_db
+from ml_models.bert_sentiment import BERTSentimentAnalyzer
+from models import ServiceCall
+from app_utils.schemas import (
     PredictionInput,
     PredictionOutput,
     PredictionOutputSentiment,

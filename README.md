@@ -8,49 +8,6 @@ Project started from [this template](https://github.com/MatthieuLeNozach/api_bas
 2. [**Getting started**](#getting-started)
 
 
-```bash
-├── app
-│   ├── database.py
-│   ├── devtools.py
-│   ├── html_text_variables.py
-│   ├── __init__.py
-│   ├── main.py
-│   ├── ml_models
-│   │   ├── bert_sentiment.py
-│   │   ├── __init__.py
-│   │   ├── nlp_utils.py
-│   │   └── roberta_emotion.py
-│   ├── models.py
-│   ├── routers
-│   │   ├── admin.py
-│   │   ├── auth.py
-│   │   ├── bert_sentiment.py
-│   │   ├── roberta_emotion.py
-│   │   └── users.py
-│   ├── schemas.py
-│   └── templates
-│       └── home.html
-├── __init__.py
-├── LICENSE
-├── readme
-│   └── image_xx.png
-├── README.md
-├── requirements.txt
-├── run.sh
-├── run_tests.sh
-├── sqlite3
-│   ├── dev_db.db
-│   └── test_db.db
-└── test
-    ├── __init__.py
-    ├── test_admin.py
-    ├── test_auth.py
-    ├── test_main.py
-    ├── test_ml_service_v1.py
-    ├── test_ml_service_v2.py
-    ├── test_users.py
-    └── utils.py
-```
 
 
 

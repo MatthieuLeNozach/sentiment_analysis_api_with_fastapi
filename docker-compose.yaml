@@ -1,0 +1,81 @@
+version: '3.9'
+
+x-common-env: &common-env
+  env_file:
+    - .env
+  environment:
+    - RABBITMQ_HOST=rabbitmq
+    - RABBITMQ_PORT=5672
+    - CREATE_SUPERUSER=1
+    - SQL_URL=sqlite:///./sqlite3/dev_db.db
+    - SECRET_KEY=XxWmu19i1zLv0jzkdju0fDBL8OPJ6NfwySzs7+O0SUvRVYDgJqkVqbbNWbyy760B
+
+services:
+  api:
+    <<: *common-env
+    image: ${DOCKERHUB_ACCOUNT}/${DOCKERHUB_REPO}:api
+    ports:
+      - "8001:8000"
+    depends_on:
+      - redis
+#      - postgres
+    volumes:
+      - ./app/api:/app/api
+      - ./app/app_utils:/app/app_utils
+    networks:
+      - backend
+    command: sh -c "sleep 5 && uvicorn api/main:app --host 0.0.0.0 --port 8000 --reload"
+    restart: always
+
+  inference:
+    <<: *common-env
+    image: ${DOCKERHUB_ACCOUNT}/${DOCKERHUB_REPO}:inference
+    depends_on:
+      - redis
+    # volumes:
+    #   - ./app/inference:/app/inference
+    #   - ./app/app_utils:/app/app_utils
+    networks:
+      - backend
+    # command: sh -c "sleep 5 && python3 inference/worker.py"
+    command: sh -c "sleep 5 && celery -A inference.worker worker --loglevel=info"
+    restart: always
+
+  user-postgres:
+    <<: *common-env
+    image: postgres:13
+    volumes:
+      - ./db:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      interval: 5s
+      retries: 5
+    restart: always
+    networks:
+      - backend
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:6.2
+    ports:
+      - 16379:6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+    restart: always
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend
+
+
+volumes:
+  redis_data:
+
+networks:
+  backend:
+    driver: bridge

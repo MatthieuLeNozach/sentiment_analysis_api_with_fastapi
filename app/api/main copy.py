@@ -40,8 +40,8 @@ import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
 
-from .database import SessionLocal, engine
-from .devtools import create_superuser, remove_superuser
+from database import SessionLocal, engine
+from devtools import create_superuser, remove_superuser
 from .ml_models.bert_sentiment import BERTSentimentAnalyzer
 from .ml_models.roberta_emotion import RobertaEmotionAnalyzer
 from .models import Base

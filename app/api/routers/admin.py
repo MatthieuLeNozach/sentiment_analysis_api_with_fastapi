@@ -31,10 +31,10 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Path, status
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from ..database import get_db
-from ..models import User
-from ..schemas import ChangeUserAccessRights, CreateAdmin, ReadUser
-from .auth import bcrypt_context, get_current_user
+from database import get_db
+from models import User
+from app_utils.schemas import ChangeUserAccessRights, CreateAdmin, ReadUser
+from auth import bcrypt_context, get_current_user
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 

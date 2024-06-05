@@ -35,9 +35,9 @@ from passlib.context import CryptContext
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from ..database import get_db
-from ..models import User
-from ..schemas import CreateUser, Token, TokenData
+from database import get_db
+from models import User
+from app_utils.schemas import CreateUser, Token, TokenData
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
