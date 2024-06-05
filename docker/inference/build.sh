@@ -18,22 +18,17 @@ fi
 
 # Ensure the destination directory exists
 mkdir -p ./inference
+
 # Copy the contents of the source inference directory to the already created destination directory
 cp -r ../../app/inference/. ./inference/
 
+# Ensure the common_utils directory exists
+mkdir -p ./inference/common_utils
 
-# # Ensure the app_utils directory exists
-# mkdir -p ./app_utils
-# # Copy the contents of the app_utils directory to the already created destination directory
-# cp -r ../../app/app_utils/. ./app_utils/
-# ls ./app_utils
-
-# Ensure the app_utils directory exists
-mkdir -p ./app_utils
-# Copy the contents of the app_utils directory to the already created destination directory
-cp -r ../../app/app_utils/. ./inference/app_utils/
-ls ./app_utils
-
+# Copy the contents of the common_utils directory to the already created destination directory
+cp -r ../../app/common_utils/. ./inference/common_utils/
+echo "Checking the '/inference/common_utils' content brought to image build context:"
+ls ./inference/common_utils
 
 # Copy model weights to the build context
 if [ -d "../../models/" ]; then
@@ -49,6 +44,5 @@ fi
 docker build -t "${DOCKERHUB_ACCOUNT}/${DOCKERHUB_REPO}:${FOLDER_NAME}" -f "Dockerfile.${FOLDER_NAME}" --build-arg BASE_IMAGE="${DOCKERHUB_ACCOUNT}/bird-sound-classif:base" .
 
 # Cleanup: Remove copied directories
-rm -rf ./app_utils
 rm -rf ./inference
 rm -rf ./models

@@ -1,7 +1,7 @@
 from celery import Celery
 from ml_models.bert_sentiment import  BERTSentimentAnalyzer
 from ml_models.roberta_emotion import RobertaEmotionAnalyzer
-from app_utils.schemas import (
+from common_utils.schemas import (
     PredictionInput, 
     PredictionOutputEmotion, 
     PredictionOutputSentiment

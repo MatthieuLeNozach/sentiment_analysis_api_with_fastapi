@@ -29,7 +29,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-from app_utils.schemas import PredictionInput, PredictionOutputEmotion
+from common_utils.schemas import PredictionInput, PredictionOutputEmotion
 from ml_models.nlp_utils import TextPreprocessor
 
 # BERT OneHot 5-class sentiment classifier

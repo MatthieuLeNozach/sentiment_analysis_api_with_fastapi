@@ -16,37 +16,24 @@ if [ -z "$DOCKERHUB_ACCOUNT" ]; then
     exit 1
 fi
 
-
-
-
-
 # Ensure the destination directory exists
 mkdir -p ./api
+
 # Copy the contents of the source api directory to the already created destination directory
 cp -r ../../app/api/. ./api/
 echo "Checking the '/api' content brought to image build context:"
 ls ./api
 
+# Ensure the common_utils directory exists
+mkdir -p ./api/common_utils
 
-# # Ensure the app_utils directory exists
-# mkdir -p ./app_utils
-# # Copy the contents of the app_utils directory to the already created destination directory
-# cp -r ../../app/app_utils/. ./app_utils/
-# ls ./app_utils
-
-# Ensure the app_utils directory exists
-mkdir -p ./api/app_utils
-# Copy the contents of the app_utils directory to the already created destination directory
-cp -r ../../app/app_utils/. ./api/app_utils/
-ls ./api/app_utils
-
-echo "Checking the '/api' content brought to image build context:"
-ls ./api
-
+# Copy the contents of the common_utils directory to the already created destination directory
+cp -r ../../app/common_utils/. ./api/common_utils/
+echo "Checking the '/api/common_utils' content brought to image build context:"
+ls ./api/common_utils
 
 # Build the Docker image with the folder name as the tag and the provided Docker Hub account name
 docker build -t "${DOCKERHUB_ACCOUNT}/${DOCKERHUB_REPO}:${FOLDER_NAME}" -f "Dockerfile.${FOLDER_NAME}" --build-arg BASE_IMAGE="${DOCKERHUB_ACCOUNT}/bird-sound-classif:base" .
 
 # Cleanup: Remove copied directories
-rm -rf ./app_utils
 rm -rf ./api

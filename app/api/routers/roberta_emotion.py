@@ -37,7 +37,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from ml_models.roberta_emotion import RobertaEmotionAnalyzer
 from models import ServiceCall
-from app_utils.schemas import PredictionInput, PredictionOutputEmotion, ServiceCallCreate
+from common_utils.schemas import PredictionInput, PredictionOutputEmotion, ServiceCallCreate
 from auth import get_current_user
 
 router = APIRouter(prefix="/mlservice/emotion", tags=["mlservice/emotion"])
