@@ -29,7 +29,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models import User
 from common_utils.schemas import ReadUser, UserVerification
-from auth import get_current_user
+from api.auth_utils import get_current_user
 
 router = APIRouter(prefix="/user", tags=["user"])
 

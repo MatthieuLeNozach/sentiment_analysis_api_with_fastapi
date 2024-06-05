@@ -4,6 +4,7 @@ sqlite3/test_db.db
 readme/from_project_template.md
 
 temp/
+docker/postgres/init.sql
 # Ignore env file
 .env
 

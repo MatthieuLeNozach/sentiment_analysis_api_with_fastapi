@@ -6,15 +6,15 @@ from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from app.api.models import User
-from app.auth_utils import (
+from api.models import User
+from api.auth_utils import (
     authenticate_user,
     bcrypt_context,
     create_access_token,
     db_dependency,
     get_current_user,
 )
-from app.common_utils.schemas import CreateUser, Token, TokenData
+from api.common_utils.schemas import CreateUser, Token, TokenData
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

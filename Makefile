@@ -1,3 +1,9 @@
+generate-pwd-hash:
+	bash run.sh generate:pwd-hash
+
+transform-init-sql:
+	bash run.sh transform:init-sql
+	
 build-api:
 	bash run.sh build:api
 
@@ -9,3 +15,5 @@ build-all:
 
 lint:
 	bash run.sh lint
+
+

@@ -41,14 +41,20 @@ services:
     #command: sh -c "sleep 5 && celery -A inference.worker worker --loglevel=info"
     restart: always
 
-  user-postgres:
+
+  postgres:
     <<: *common-env
     image: postgres:13
+    environment:
+      POSTGRES_USER: webapp_user
+      POSTGRES_PASSWORD: webapp_password
+      POSTGRES_DB: webapp
+      SUPERUSER_HASH_PASSWORD: ${SUPERUSER_HASHED_PASSWORD}
     volumes:
-      - ./db:/var/lib/postgresql/data
+#      - ./db:/var/lib/postgresql/data
       - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      test: ["CMD", "pg_isready", "-U", "webapp_user", "-d", "webapp"]
       interval: 5s
       retries: 5
     restart: always

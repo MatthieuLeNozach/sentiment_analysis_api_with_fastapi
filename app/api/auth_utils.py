@@ -8,14 +8,14 @@ from passlib.context import CryptContext
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from app.api.models import User
-from app.commmon_utils.schemas import TokenData
+from api.models import User
+from api.commmon_utils.schemas import TokenData
 from fastapi.security import OAuth2PasswordBearer
 
 SECRET_KEY = os.environ["SECRET_KEY"]
 from typing import Annotated  # Import the Annotated class from the typing module
 
-from app.database import get_db  # Import the get_db function from the app.database module
+from api.database import get_db  # Import the get_db function from the database module
 
 ALGORITHM = "HS256"
 

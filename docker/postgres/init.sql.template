@@ -1,5 +1,6 @@
 -- Create the webapp database if it doesn't exist
-SELECT 'CREATE DATABASE webapp' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'webapp')\gexec
+SELECT 'CREATE DATABASE webapp'
+WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'webapp')\gexec
 
 -- Connect to the webapp database
 \c webapp;
@@ -33,11 +34,7 @@ CREATE TABLE IF NOT EXISTS service_calls (
 DO
 $$
 BEGIN
-    IF NOT EXISTS (
-        SELECT
-        FROM   pg_catalog.pg_roles
-        WHERE  rolname = 'webapp_user') THEN
-
+    IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'webapp_user') THEN
         CREATE ROLE webapp_user LOGIN PASSWORD 'webapp_password';
     END IF;
 END
@@ -45,3 +42,7 @@ $$;
 
 GRANT ALL PRIVILEGES ON DATABASE webapp TO webapp_user;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO webapp_user;
+
+-- Insert the superuser into the users table
+INSERT INTO users (username, first_name, last_name, country, hashed_password, is_active, role, has_access_sentiment, has_access_emotion)
+VALUES ('superuser', 'Super', 'User', 'N/A', '${SUPERUSER_HASHED_PASSWORD}', TRUE, 'admin', TRUE, TRUE);
