@@ -18,7 +18,7 @@ function try-load-dotenv {
 }
 
 # Transform init.sql.template into init.sql
-function transform:init-sql {
+function transform:init-sql() {
     try-load-dotenv
 
     if [ ! -f "$THIS_DIR/docker/postgres/init.sql.template" ]; then
@@ -31,7 +31,7 @@ function transform:init-sql {
 }
 
 # install core and development Python dependencies into the currently activated venv
-function install-requirements {
+function install-requirements() {
     python -m pip install --upgrade pip
     python -m pip install -r requirements_ci.txt
 }
@@ -61,6 +61,10 @@ function build:all() {
     build:inference
 }
 
+function purge:pycache() {
+    find . -type d -name "__pycache__" -exec sudo rm -r {} +
+    find . -type f -name "*.pyc" -exec sudo rm -f {} +
+}
 
 
 # print all functions in this file

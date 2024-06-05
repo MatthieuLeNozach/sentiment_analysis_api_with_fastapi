@@ -15,8 +15,6 @@ The module includes the following main components:
     - `users`: User-related routes.
     - `bert_sentiment`: Machine learning service BERT sentiment analyzer routes.
     - `roberta_emotion`: Machine learning service roBERTa emotion analyzer analyzer routes.
-- Database:
-  - The database tables are created based on the defined models using `Base.metadata.create_all`.
 
 - Lifespan Events:
   - `startup_event`: Called when the application starts up. It creates a superuser if the
@@ -37,13 +35,11 @@ folder for the application to function properly.
 
 import os
 
-from dotenv import load_dotenv
 from fastapi import FastAPI
 
 from database import SessionLocal, engine
 from devtools import create_superuser, remove_superuser
 
-from models import Base
 from routers import admin, auth, bert_sentiment, roberta_emotion, users
 
 #load_dotenv(override=True)  # loads environment variables from the .environment folder
@@ -57,58 +53,6 @@ app.include_router(bert_sentiment.router)
 app.include_router(roberta_emotion.router)
 
 
-############### DATABASE ###############
-Base.metadata.create_all(bind=engine)
-
-
-############### LIFESPAN ###############
-@app.on_event("startup")
-async def startup_event():
-    """Startup event handler for the FastAPI application.
-
-    This function is called when the application starts up. It performs the following tasks:
-    1. If the environment variable "CREATE_SUPERUSER" is set to a truthy value,
-    it creates a superuser in the database using the `create_superuser` function.
-    2. Loads the machine learning models for version 1 and version 2 using the `load_model` method
-       of the respective model instances.
-
-    Returns
-    -------
-        None
-
-    Raises
-    ------
-        None
-
-    """
-    if os.getenv("CREATE_SUPERUSER", "False").lower() in ["true", "1", "yes"]:
-        db = SessionLocal()
-        create_superuser(db)
-        db.close()
-
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Shutdown event handler for the FastAPI application.
-
-    This function is called when the application shuts down. It performs the following task:
-    1. If the environment variable "CREATE_SUPERUSER" is set to a truthy value,
-    it removes the superuser from the database using the `remove_superuser` function.
-
-    Returns
-    -------
-        None
-
-    Raises
-    ------
-        None
-
-    """
-    if os.getenv("CREATE_SUPERUSER", "False").lower() in ["true", "1", "yes"]:
-        db = SessionLocal()
-        remove_superuser(db)
-        db.close()
 
 
 ############### ROUTES ###############

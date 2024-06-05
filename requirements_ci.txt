@@ -7,3 +7,4 @@ pytest-runner==6.0.1
 pytest-smtp==0.1
 pytest-smtpd==0.1.0
 ruff==0.4.7
+loguru

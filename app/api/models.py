@@ -52,32 +52,9 @@ from sqlalchemy.sql import func
 
 from database import Base
 
-
 class User(Base):
-    """Represents a user in the system.
-
-    Attributes
-    ----------
-        id (int): The unique identifier of the user.
-        username (str): The username of the user.
-        first_name (str): The first name of the user.
-        last_name (str): The last name of the user.
-        country (str): The country of the user (optional).
-        hashed_password (str): The hashed password of the user.
-        is_active (bool): Indicates whether the user is active.
-        role (str): The role of the user.
-        has_access_sentiment (bool): Indicates whether the user
-            has access to sentiment analyzer model.
-        has_access_emotion (bool): Indicates whether the user
-            has access to emotion analyzer model.
-        service_calls (list): The service calls associated with the user.
-
-    Methods
-    -------
-        __init__(self, **kwargs): Initializes a new instance of the User class.
-
-    """
-
+    """Represents a user in the system."""
+    
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
@@ -92,27 +69,9 @@ class User(Base):
     has_access_emotion: Mapped[bool] = mapped_column(Boolean, default=False)
     service_calls = relationship("ServiceCall", back_populates="user")
 
-
 class ServiceCall(Base):
-    """Represents a service call made by a user.
-
-    Attributes
-    ----------
-        id (str): The unique identifier of the service call.
-        service_version (str): The version of the service called.
-        success (bool): Indicates whether the service call was successful.
-        owner_id (int): The ID of the user who made the service call.
-        request_time (DateTime): The timestamp of when the service call was requested.
-        completion_time (DateTime): The timestamp of when the service call was completed.
-        duration (float): The duration of the service call in seconds.
-        user (User): The user associated with the service call.
-
-    Methods
-    -------
-        __init__(self, **kwargs): Initializes a new instance of the ServiceCall class.
-
-    """
-
+    """Represents a service call made by a user."""
+    
     __tablename__ = "service_calls"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)

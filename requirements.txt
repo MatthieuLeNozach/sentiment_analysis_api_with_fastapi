@@ -10,7 +10,7 @@ python-dotenv==1.0.1
 python-multipart==0.0.7
 SQLAlchemy==2.0.23
 uvicorn==0.28.0
-
+loguru
 
 torch==2.2.1+cu118
 transformers==4.39.0

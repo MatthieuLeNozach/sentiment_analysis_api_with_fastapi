@@ -2,6 +2,7 @@ celery
 redis
 pydantic
 pydantic[email]
+loguru
 # torch==2.2.1+cu118
 # transformers==4.39.0
 

@@ -3,7 +3,7 @@ generate-pwd-hash:
 
 transform-init-sql:
 	bash run.sh transform:init-sql
-	
+
 build-api:
 	bash run.sh build:api
 
@@ -16,4 +16,7 @@ build-all:
 lint:
 	bash run.sh lint
 
+
+purge-pycache:
+	bash run.sh purge:pycache
 
