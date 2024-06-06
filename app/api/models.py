@@ -50,13 +50,13 @@ from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
-from database import Base
+from api.database import Base
 
 class User(Base):
     """Represents a user in the system."""
     
-    __tablename__ = "users"
-
+    __tablename__ = 'user'
+    __table_args__ = {'extend_existing': True}
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     username: Mapped[str] = mapped_column(String(127), unique=True)
     first_name: Mapped[str] = mapped_column(String(127))
@@ -72,8 +72,8 @@ class User(Base):
 class ServiceCall(Base):
     """Represents a service call made by a user."""
     
-    __tablename__ = "service_calls"
-
+    __tablename__ = "service_call"
+    __table_args__ = {'extend_existing': True}
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     service_version: Mapped[str] = mapped_column(String(2))
     success: Mapped[bool] = mapped_column(Boolean, default=False)

@@ -19,7 +19,7 @@ validation and storage. It also uses the `get_current_user` dependency for authe
 Password hashing is performed using the `bcrypt` algorithm through the `CryptContext` class from
 the `passlib` library.
 """
-
+from starlette.config import Config
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -29,8 +29,11 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models import User
 from common_utils.schemas import ReadUser, UserVerification
-from api.auth_utils import get_current_user
+from api.deps import get_current_user
 
+from loguru import logger
+
+logger.info("Adding `user` router...")
 router = APIRouter(prefix="/user", tags=["user"])
 
 ############### DEPENDENCIES ###############

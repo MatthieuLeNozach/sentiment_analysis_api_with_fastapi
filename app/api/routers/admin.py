@@ -34,8 +34,11 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models import User
 from common_utils.schemas import ChangeUserAccessRights, CreateAdmin, ReadUser
-from api.auth_utils import bcrypt_context, get_current_user
+from api.deps import bcrypt_context, get_current_user
 
+from loguru import logger
+
+logger.info("Adding `admin` router...")
 router = APIRouter(prefix="/admin", tags=["admin"])
 
 # pylint: disable=c0103

@@ -1,23 +1,24 @@
 import os
 from datetime import datetime, timedelta
+
 from typing import Optional
+from common_utils.schemas import TokenData
 
 from fastapi import Depends, HTTPException, status
-from jose import jwt
+
 from passlib.context import CryptContext
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from api.models import User
-from api.commmon_utils.schemas import TokenData
+
 from fastapi.security import OAuth2PasswordBearer
 
-SECRET_KEY = os.environ["SECRET_KEY"]
+from jose import jwt
 from typing import Annotated  # Import the Annotated class from the typing module
 
 from api.database import get_db  # Import the get_db function from the database module
-
-ALGORITHM = "HS256"
+from utils import ALGORITHM, SECRET_KEY
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

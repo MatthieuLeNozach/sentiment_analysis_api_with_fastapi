@@ -48,18 +48,50 @@ function build:api() {
     bash docker/api/build.sh "${DOCKERHUB_ACCOUNT}" "${DOCKERHUB_REPO}"
 }
 
+function build:migrate() {
+    source .env
+    echo "running build-migrate..."
+    bash docker/migrate/build.sh "${DOCKERHUB_ACCOUNT}" "${DOCKERHUB_REPO}"
+}
+
 function build:inference() {
     source .env
     echo "running build-inference..."
     bash docker/inference/build.sh "${DOCKERHUB_ACCOUNT}" "${DOCKERHUB_REPO}"
 }
 
-
 function build:all() {
     echo "Building all images..."
     build:api
     build:inference
+    build:migrate
 }
+
+function push:api() {
+    source .env
+    echo "running push-api..."
+    bash docker/api/push.sh "${DOCKERHUB_ACCOUNT}" "${DOCKERHUB_REPO}"
+}
+
+function push:migrate() {
+    source .env
+    echo "running push-migrate..."
+    bash docker/migrate/push.sh "${DOCKERHUB_ACCOUNT}" "${DOCKERHUB_REPO}"
+}
+
+function push:inference() {
+    source .env
+    echo "running push-inference..."
+    bash docker/inference/push.sh "${DOCKERHUB_ACCOUNT}" "${DOCKERHUB_REPO}"
+}
+
+function push:all() {
+    echo "pushing all images..."
+    push:api
+    push:inference
+    #push:migrate
+}
+
 
 function purge:pycache() {
     find . -type d -name "__pycache__" -exec sudo rm -r {} +

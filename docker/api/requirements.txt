@@ -14,3 +14,4 @@ uvicorn==0.28.0
 
 loguru
 psycopg2-binary
+alembic

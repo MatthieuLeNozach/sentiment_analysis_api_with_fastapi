@@ -6,7 +6,7 @@ WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'webapp')\gexec
 \c webapp;
 
 -- Create the users table if it doesn't exist
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS "user" (
     id SERIAL PRIMARY KEY,
     username VARCHAR(127) UNIQUE,
     first_name VARCHAR(127),
@@ -19,12 +19,12 @@ CREATE TABLE IF NOT EXISTS users (
     has_access_emotion BOOLEAN DEFAULT FALSE
 );
 
--- Create the service_calls table if it doesn't exist
-CREATE TABLE IF NOT EXISTS service_calls (
+-- Create the service_ table if it doesn't exist
+CREATE TABLE IF NOT EXISTS service_call (
     id SERIAL PRIMARY KEY,
     service_version VARCHAR(2),
     success BOOLEAN DEFAULT FALSE,
-    owner_id INTEGER REFERENCES users(id),
+    owner_id INTEGER REFERENCES "user"(id),
     request_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     completion_time TIMESTAMP,
     duration FLOAT
@@ -43,6 +43,6 @@ $$;
 GRANT ALL PRIVILEGES ON DATABASE webapp TO webapp_user;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO webapp_user;
 
--- Insert the superuser into the users table
-INSERT INTO users (username, first_name, last_name, country, hashed_password, is_active, role, has_access_sentiment, has_access_emotion)
+-- Insert the superuser into the user table
+INSERT INTO "user" (username, first_name, last_name, country, hashed_password, is_active, role, has_access_sentiment, has_access_emotion)
 VALUES ('superuser', 'Super', 'User', 'N/A', '${SUPERUSER_HASHED_PASSWORD}', TRUE, 'admin', TRUE, TRUE);

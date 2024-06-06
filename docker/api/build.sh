@@ -33,7 +33,7 @@ echo "Checking the '/api/common_utils' content brought to image build context:"
 ls ./api/common_utils
 
 # Build the Docker image with the folder name as the tag and the provided Docker Hub account name
-docker build -t "${DOCKERHUB_ACCOUNT}/${DOCKERHUB_REPO}:${FOLDER_NAME}" -f "Dockerfile.${FOLDER_NAME}" --build-arg BASE_IMAGE="${DOCKERHUB_ACCOUNT}/bird-sound-classif:base" .
+docker build -t "${DOCKERHUB_ACCOUNT}/${DOCKERHUB_REPO}:${FOLDER_NAME}" -f "Dockerfile.${FOLDER_NAME}" .
 
 # Cleanup: Remove copied directories
 rm -rf ./api

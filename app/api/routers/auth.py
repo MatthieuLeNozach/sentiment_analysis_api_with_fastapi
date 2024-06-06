@@ -7,15 +7,18 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from api.models import User
-from api.auth_utils import (
+from api.deps import (
     authenticate_user,
     bcrypt_context,
     create_access_token,
     db_dependency,
     get_current_user,
 )
-from api.common_utils.schemas import CreateUser, Token, TokenData
+from common_utils.schemas import CreateUser, Token, TokenData
 
+from loguru import logger
+
+logger.info("Adding `auth` router...")
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/create", status_code=status.HTTP_201_CREATED)

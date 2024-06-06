@@ -5,10 +5,14 @@ x-common-env: &common-env
     - .env
   environment:
     - POSTGRES_DB=${POSTGRES_DB_DEV}
-    - RABBITMQ_PORT=5672
     - CREATE_SUPERUSER=1
     - SQL_URL=sqlite:///./sqlite3/dev_db.db
-    - SECRET_KEY=XxWmu19i1zLv0jzkdju0fDBL8OPJ6NfwySzs7+O0SUvRVYDgJqkVqbbNWbyy760B
+#    - POSTGRES_DB=${POSTGRES_DB}
+    - POSTGRES_USER=${POSTGRES_USER}
+    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    - POSTGRES_HOST=${POSTGRES_HOST}
+    - POSTGRES_PORT=${POSTGRES_PORT}
+#    - SQL_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
 
 services:
   api:
@@ -77,6 +81,22 @@ services:
       - redis_data:/data
     networks:
       - backend
+
+  migrate:
+    <<: *common-env
+    image: ${DOCKERHUB_ACCOUNT}/${DOCKERHUB_REPO}:migrate
+    depends_on:
+      - postgres
+    networks:
+      - backend
+    working_dir: /app
+    environment:
+      - PYTHONPATH=/app
+      - SQL_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+
+    # command: >
+    #   sh -c "alembic upgrade head"
+    restart: "no"
 
 
 volumes:

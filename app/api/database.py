@@ -28,6 +28,7 @@ each request.
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
+from loguru import logger
 
 # Get the environment variables
 POSTGRES_USER = os.getenv("POSTGRES_USER")
@@ -47,8 +48,10 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 def get_db():
+    logger.debug('Instantiating a SessionLocal...')
     db = SessionLocal()
     try:
+        logger.info("Yielding a SessionLocal...")
         yield db
     finally:
         db.close()

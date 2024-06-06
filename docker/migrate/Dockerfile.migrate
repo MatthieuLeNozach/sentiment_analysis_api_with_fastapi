@@ -1,0 +1,12 @@
+# Start from the API Docker image
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the Alembic files to the working directory
+COPY . /app
+
+# Set the entrypoint for the migration container
+CMD ["alembic", "upgrade", "head"]

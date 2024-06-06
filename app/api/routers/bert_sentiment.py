@@ -42,7 +42,6 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from database import get_db
-from ml_models.bert_sentiment import BERTSentimentAnalyzer
 from models import ServiceCall
 from common_utils.schemas import (
     PredictionInput,
@@ -52,35 +51,17 @@ from common_utils.schemas import (
 )
 from .auth import get_current_user
 
+from loguru import logger
+
+logger.info("Adding `bert_sentiment` router...")
 router = APIRouter(prefix="/mlservice/sentiment", tags=["mlservice/sentiment"])
 
 bert_sentiment_analyzer = BERTSentimentAnalyzer()
 
 
 ############### DEPENDENCIES ###############
-async def get_model_bert_sentiment(
-    model: BERTSentimentAnalyzer = Depends(),
-) -> BERTSentimentAnalyzer:
-    """Dependency function to lazy-load the ML model.
-
-    Args:
-    ----
-        model: The BERTSentimentAnalyzer instance to be loaded.
-
-    Returns:
-    -------
-        The loaded BERTSentimentAnalyzer instance.
-
-    """
-    if not model.loaded:
-        await model.load_model()
-    return model
-
-
-# pylint: disable=c0103
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]
-bert_sentiment_dependency = Annotated[BERTSentimentAnalyzer, Depends(get_model_bert_sentiment)]  # pylint: enable=c0103
 
 
 ############### HELPERS ###############

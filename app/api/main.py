@@ -38,21 +38,21 @@ import os
 from fastapi import FastAPI
 
 from database import SessionLocal, engine
-from devtools import create_superuser, remove_superuser
 
-from routers import admin, auth, bert_sentiment, roberta_emotion, users
+from routers import admin, auth, users#, bert_sentiment, roberta_emotion, users
+from loguru import logger
 
 #load_dotenv(override=True)  # loads environment variables from the .environment folder
 
 ############### API ###############
+logger.info("Starting FastAPI...")
 app = FastAPI()
 app.include_router(auth.router)
 app.include_router(admin.router)
 app.include_router(users.router)
-app.include_router(bert_sentiment.router)
-app.include_router(roberta_emotion.router)
-
-
+# app.include_router(bert_sentiment.router)
+# app.include_router(roberta_emotion.router)
+logger.info("All FastAPI routers added")
 
 
 ############### ROUTES ###############

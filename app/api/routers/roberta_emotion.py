@@ -38,8 +38,11 @@ from database import get_db
 from ml_models.roberta_emotion import RobertaEmotionAnalyzer
 from models import ServiceCall
 from common_utils.schemas import PredictionInput, PredictionOutputEmotion, ServiceCallCreate
-from api.auth_utils import get_current_user
+from api.deps import get_current_user
 
+from loguru import logger
+
+logger.info("Adding `roberta_sentiment` router...")
 router = APIRouter(prefix="/mlservice/emotion", tags=["mlservice/emotion"])
 
 roberta_emotion_analyzer = RobertaEmotionAnalyzer()
