@@ -54,5 +54,5 @@ repos:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix, --config=pyproject.toml]
       - id: ruff-format
-    exclude: |
-      (?x)^src/
+    # exclude: |
+    #   (?x)^src/
