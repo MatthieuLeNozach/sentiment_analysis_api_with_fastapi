@@ -4,10 +4,10 @@ ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
 
-COPY ./compose/fastapi-celery/celery/flower/start /start
-RUN sed -i 's/\r$//g' /start
-RUN chmod +x /start
-RUN chown fastapi /start
+COPY ./compose/fastapi-celery/celery/flower/start /start-flower
+RUN sed -i 's/\r$//g' /start-flower
+RUN chmod +x /start-flower
+RUN chown fastapi /start-flower
 
 RUN mkdir /app
 WORKDIR /app
@@ -19,4 +19,4 @@ RUN chown -R fastapi:fastapi /app
 
 USER fastapi
 
-CMD ["/start"]
+CMD ["/start-flower"]

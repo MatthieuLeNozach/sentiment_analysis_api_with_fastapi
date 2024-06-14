@@ -20,15 +20,29 @@ class BaseConfig:
 
     BASE_DIR: pathlib.Path = pathlib.Path(__file__).parent.parent
     UPLOAD_DEFAULT_DEST: ClassVar[str] = str(BASE_DIR / "upload")
-    DATABASE_URL: ClassVar[str] = os.environ.get(
-        "DATABASE_URL", f"sqlite+aiosqlite:///{BASE_DIR}/db.sqlite3"
-    )
+    
+    
+    # DATABASE_URL: ClassVar[str] = os.environ.get(
+    #     "DATABASE_URL", f"sqlite+aiosqlite:///{BASE_DIR}/db.sqlite3"
+    # )
+    # Construct DATABASE_URL using environment variables
+    DB_USER = os.environ.get("POSTGRES_USER", "user")
+    DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD", "password")
+    DB_HOST = os.environ.get("POSTGRES_HOST", "localhost")
+    DB_PORT = os.environ.get("POSTGRES_PORT", "5432")
+    DB_NAME = os.environ.get("POSTGRES_DB", "dbname")
+
+    DATABASE_URL: ClassVar[str] = (
+        f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    )    
     DATABASE_CONNECT_DICT: ClassVar[dict] = {}
 
     CELERY_BROKER_URL: str = os.environ.get("CELERY_BROKER_URL", "redis://127.0.0.1:6379/0")
     CELERY_RESULT_BACKEND: str = os.environ.get(
         "CELERY_RESULT_BACKEND", "redis://127.0.0.1:6379/0"
     )
+    
+    
     WS_MESSAGE_QUEUE: str = os.environ.get("WS_MESSAGE_QUEUE", "redis://127.0.0.1:6379/0")
 
     # CELERY_TASK_ALWAYS_EAGER: bool = True

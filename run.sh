@@ -51,7 +51,7 @@ build_image() {
     fi
 }
 # Function to build all Docker images
-build_all_images() {
+build_all() {
     # Define the target directories and whether they should be built from the base image
     declare -A target_dirs=(
         ["compose/fastapi-celery/base"]=false

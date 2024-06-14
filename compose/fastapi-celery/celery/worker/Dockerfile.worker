@@ -4,10 +4,13 @@ ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
 
-COPY ./compose/fastapi-celery/celery/worker/start /start
-RUN sed -i 's/\r$//g' /start
-RUN chmod +x /start
-RUN chown fastapi /start
+COPY ./compose/fastapi-celery/celery/worker/start /start-worker
+RUN sed -i 's/\r$//g' /start-worker
+RUN chmod +x /start-worker
+RUN chown fastapi /start-worker
+
+COPY ./compose/fastapi-celery/celery/worker/requirements.txt /requirements.txt
+RUN pip install -r /requirements.txt
 
 RUN mkdir /app
 WORKDIR /app
@@ -19,3 +22,4 @@ RUN chown -R fastapi:fastapi /app
 
 USER fastapi
 
+CMD ["/start-worker"]
