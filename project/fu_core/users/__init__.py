@@ -2,10 +2,12 @@ import uuid
 from typing import Optional
 
 from fastapi import Request
+from fastapi_users import BaseUserManager, FastAPIUsers, UUIDIDMixin
+
 from project.config import settings
 from project.fu_core.security import auth_backend
-from project.fu_core.users import models, deps
-from fastapi_users import BaseUserManager, FastAPIUsers, UUIDIDMixin
+from project.fu_core.users import deps, models
+
 
 class UserManager(UUIDIDMixin, BaseUserManager[models.User, uuid.UUID]):
     reset_password_token_secret = settings.SECRET_KEY
@@ -23,8 +25,8 @@ class UserManager(UUIDIDMixin, BaseUserManager[models.User, uuid.UUID]):
         self, user: models.User, token: str, request: Optional[Request] = None
     ):
         print(f"Verification requested for user {user.id}. Verification token: {token}")
-        
-        
+
+
 fastapi_users = FastAPIUsers[models.User, uuid.UUID](deps.get_user_manager, [auth_backend])
 
 current_active_user = fastapi_users.current_user(active=True)

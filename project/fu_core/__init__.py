@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends
-from project.fu_core.users import schemas
+
 from project.fu_core.security import auth_backend
-from project.fu_core.users import fastapi_users
-from project.fu_core.users import current_active_user
+from project.fu_core.users import current_active_user, fastapi_users, schemas
 from project.fu_core.users.models import User
 
 api_router = APIRouter()
@@ -30,6 +29,7 @@ api_router.include_router(
     prefix="/users",
     tags=["users"],
 )
+
 
 @api_router.get("/authenticated-route")
 async def authenticated_route(user: User = Depends(current_active_user)):
