@@ -3,10 +3,5 @@
 set -o errexit
 set -o nounset
 
-# Ensure the celerybeat-schedule file has the correct permissions
-touch './celerybeat-schedule'
-chmod 664 './celerybeat-schedule'
-chown fastapi:fastapi './celerybeat-schedule'
-
 rm -f './celerybeat.pid'
-celery -A main.celery beat -l info
+celery -A main.celery beat -l info --scheduler redbeat.RedBeatScheduler
