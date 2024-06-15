@@ -1,18 +1,21 @@
 #!/bin/bash
 
-# if any of the commands in your code fails for any reason, the entire script fails
 set -o errexit
-# fail exit if one of your pipe command fails
 set -o pipefail
-# exits if any of your variables is not set
 set -o nounset
 
-# Set the environment variables
 export POSTGRES_USER=postgres
 export POSTGRES_PASSWORD=postgres
 export POSTGRES_HOST=postgres
 export POSTGRES_PORT=5442
 export POSTGRES_NAME=postgres
+
+echo "Checking PostgreSQL connection parameters:"
+echo "POSTGRES_USER: $POSTGRES_USER"
+echo "POSTGRES_PASSWORD: $POSTGRES_PASSWORD"
+echo "POSTGRES_HOST: $POSTGRES_HOST"
+echo "POSTGRES_PORT: $POSTGRES_PORT"
+echo "POSTGRES_NAME: $POSTGRES_NAME"
 
 postgres_ready() {
 python << END
@@ -27,14 +30,16 @@ host = os.environ["POSTGRES_HOST"]
 port = os.environ["POSTGRES_PORT"]
 
 try:
-    psycopg2.connect(
+    conn = psycopg2.connect(
         dbname=dbname,
         user=user,
         password=password,
         host=host,
         port=port
     )
-except psycopg2.OperationalError:
+    conn.close()
+except psycopg2.OperationalError as e:
+    print(f"PostgreSQL connection failed: {e}")
     sys.exit(-1)
 sys.exit(0)
 

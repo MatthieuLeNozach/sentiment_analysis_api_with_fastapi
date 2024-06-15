@@ -18,10 +18,10 @@ services:
     image: postgres:16-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=fastapi_celery
-      - POSTGRES_USER=fastapi_celery
-      - POSTGRES_PASSWORD=fastapi_celery
+    env_file:
+      - .env/.dev-sample
+    ports:
+      - "5442:5432"  
 
   redis:
     image: redis:7-alpine
