@@ -7,20 +7,24 @@ set -o pipefail
 # exits if any of your variables is not set
 set -o nounset
 
+# Set the environment variables
+export POSTGRES_USER=postgres
+export POSTGRES_PASSWORD=postgres
+export POSTGRES_HOST=postgres
+export POSTGRES_PORT=5442
+export POSTGRES_NAME=postgres
 
 postgres_ready() {
 python << END
 import sys
 import psycopg2
-import urllib.parse as urlparse
 import os
 
-url = urlparse.urlparse(os.environ["DATABASE_URL"])
-dbname = url.path[1:]
-user = url.username
-password = url.password
-host = url.hostname
-port = url.port
+dbname = os.environ["POSTGRES_NAME"]
+user = os.environ["POSTGRES_USER"]
+password = os.environ["POSTGRES_PASSWORD"]
+host = os.environ["POSTGRES_HOST"]
+port = os.environ["POSTGRES_PORT"]
 
 try:
     psycopg2.connect(
@@ -36,6 +40,7 @@ sys.exit(0)
 
 END
 }
+
 until postgres_ready; do
   >&2 echo 'Waiting for PostgreSQL to become available...'
   sleep 1

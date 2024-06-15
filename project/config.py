@@ -26,11 +26,11 @@ class BaseConfig:
     #     "DATABASE_URL", f"sqlite+aiosqlite:///{BASE_DIR}/db.sqlite3"
     # )
     # Construct DATABASE_URL using environment variables
-    DB_USER = os.environ.get("POSTGRES_USER", "user")
-    DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD", "password")
+    DB_USER = os.environ.get("POSTGRES_USER", "postgres")
+    DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD", "postgres")
     DB_HOST = os.environ.get("POSTGRES_HOST", "localhost")
-    DB_PORT = os.environ.get("POSTGRES_PORT", "5432")
-    DB_NAME = os.environ.get("POSTGRES_DB", "dbname")
+    DB_PORT = os.environ.get("POSTGRES_PORT", "5442")
+    DB_NAME = os.environ.get("POSTGRES_DB", "postgres")
 
     DATABASE_URL: ClassVar[str] = (
         f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
