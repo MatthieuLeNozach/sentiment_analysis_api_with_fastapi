@@ -7,13 +7,12 @@ THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 #================================================================#
 #####################    ENV VARIABLES    ########################
 
-# Function to load environment variables from [.env/.dev-sample]
 function try-load-dotenv {
+    # Function to load environment variables from [.env/.dev-sample]
     if [ ! -f "$THIS_DIR/.env/.dev-sample" ]; then
         echo "no .env/.dev-sample file found"
         return 1
     fi
-
     while read -r line; do
         export "$line"
     done < <(grep -v '^#' "$THIS_DIR/.env/.dev-sample" | grep -v '^$')
@@ -22,16 +21,13 @@ function try-load-dotenv {
 #================================================================#
 ########################    DOCKER    ############################
 
-# Function to build a single Docker image
 function build-image() {
+    # Function to build a single Docker image
     local target_dir="$1"
-
     # Get the name of the containing folder
     folder_name=$(basename "$target_dir")
-
     # Construct the Dockerfile path
     dockerfile_path="${target_dir}/Dockerfile.${folder_name}"
-
     # Build the Docker image
     if [ "$folder_name" = "base" ]; then
         docker build -t "${DOCKERHUB_ACCOUNT}/${DOCKERHUB_REPO}:${folder_name}" -f "$dockerfile_path" .
@@ -40,11 +36,9 @@ function build-image() {
     fi
 }
 
-# Function to build all Docker images
 function build-all() {
-    # Load environment variables
+    # Function to build all Docker images
     try-load-dotenv || { echo "Failed to load environment variables"; return 1; }
-
     # Define the target directories and whether they should be built from the base image
     declare -A target_dirs=(
         ["compose/fastapi-celery/base"]=false
@@ -53,7 +47,6 @@ function build-all() {
         ["compose/fastapi-celery/celery/beat"]=true
         ["compose/fastapi-celery/celery/flower"]=true
     )
-
     # Loop through the target directories and build the images
     for target_dir in "${!target_dirs[@]}"; do
         from_base="${target_dirs[$target_dir]}"
@@ -61,25 +54,22 @@ function build-all() {
     done
 }
 
-# Function to push a single Docker image
-function push-image() {
-    local service_dir="$1"
 
+function push-image() {
+    # Function to push a single Docker image
+    local service_dir="$1"
     # Load environment variables
     try-load-dotenv || { echo "Failed to load environment variables"; return 1; }
-
     # Get the name of the containing folder
     folder_name=$(basename "$service_dir")
-
     # Push the Docker image
     docker push "${DOCKERHUB_ACCOUNT}/${DOCKERHUB_REPO}:${folder_name}"
 }
 
-# Function to push all Docker images
-function push-all-images() {
-    # Load environment variables
-    try-load-dotenv || { echo "Failed to load environment variables"; return 1; }
 
+function push-all-images() {
+    # Function to push all Docker images
+    try-load-dotenv || { echo "Failed to load environment variables"; return 1; }
     # Define the services and their corresponding Dockerfiles
     declare -A services
     services=(
@@ -88,38 +78,72 @@ function push-all-images() {
         ["compose/fastapi-celery/celery/beat"]="Dockerfile.beat"
         ["compose/fastapi-celery/celery/flower"]="Dockerfile.flower"
     )
-
     # Loop through the services and push the images
     for service_dir in "${!services[@]}"; do
         push-image "$THIS_DIR/$service_dir"
     done
 }
 
+#================================================================#
+#####################    DOCKER COMPOSE   ########################
+
+function generate-docker-compose() {
+    # Function to generate docker-compose.yml from template
+    try-load-dotenv || { echo "Failed to load environment variables"; return 1; }
+    # Path to the template file
+    local template_file="$THIS_DIR/docker-compose.template.yml"
+    # Path to the output file
+    local output_file="$THIS_DIR/docker-compose.yml"
+    # Replace placeholders in the template file with environment variables
+    envsubst < "$template_file" > "$output_file"
+}
+
+
+function up-dev() {
+    # Function to bring up services using the template
+    try-load-dotenv || { echo "Failed to load environment variables"; return 1; }
+    generate-docker-compose
+    docker compose -f "$THIS_DIR/docker-compose.yml" up
+}
 
 #================================================================#
 #######################    DATABASE    ###########################
 
+
 function init-alembic() {
+    # Init asyncchronous alembic
     alembic init -t async alembic
+    # Add essential fastapi-users imports to the script.py.mako template
+    echo 'import fastapi_users_db_sqlalchemy' >> alembic/templates/script.py.mako
 }
 
-function run-revision-postgres() {
+function get-revision-postgres() {
     try-load-dotenv || { echo "Failed to load environment variables"; return 1; }
-
+    # Ensure that docker compose down is called on script exit
+    trap 'docker compose down' EXIT
     # Start PostgreSQL service
     docker compose up -d postgres
-
     # Wait for PostgreSQL to be ready
     until docker compose exec postgres pg_isready -U "$POSTGRES_USER" -h "$POSTGRES_HOST" -p "$POSTGRES_PORT"; do
         >&2 echo "Waiting for PostgreSQL to become available..."
         sleep 1
     done
-
+    # Ensure permissions are set correctly
+    docker compose run --user root web chown -R fastapi:fastapi /app/alembic/versions
     # Run Alembic revision in the web container
     docker compose run web alembic revision --autogenerate 
+}
 
-    # Stop all services
-    docker compose down
+
+function generate-servers-json() {
+    # Function to generate servers.json from template
+    try-load-dotenv || { echo "Failed to load environment variables"; return 1; }
+    # Path to the template file
+    local template_file="$THIS_DIR/compose/pgadmin/servers.template.json"
+    # Path to the output file
+    local output_file="$THIS_DIR/compose/pgadmin/servers.json"
+    # Replace placeholders in the template file with environment variables
+    envsubst < "$template_file" > "$output_file"
 }
 
 #================================================================#
@@ -142,7 +166,7 @@ function lint {
 #================================================================#
 ########################    UTILS    #############################
 
-function purge:pycache() {
+function purge-pycache() {
     find . -type d -name "__pycache__" -exec sudo rm -r {} +
     find . -type f -name "*.pyc" -exec sudo rm -f {} +
 }
