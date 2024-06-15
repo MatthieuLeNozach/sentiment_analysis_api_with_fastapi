@@ -3,7 +3,6 @@ ARG BASE_IMAGE
 
 FROM ${BASE_IMAGE}
 
-
 COPY ./compose/fastapi-celery/web/entrypoint /entrypoint
 RUN sed -i 's/\r$//g' /entrypoint
 RUN chmod +x /entrypoint
@@ -14,13 +13,16 @@ RUN sed -i 's/\r$//g' /start
 RUN chmod +x /start
 RUN chown fastapi /start
 
-RUN mkdir /app
+RUN mkdir -p /app/alembic/versions
+RUN chmod -R 777 /app/alembic/versions
+
 WORKDIR /app
 
 # copy project code
 COPY . .
 
 RUN chown -R fastapi:fastapi /app
+RUN chmod -R 777 /app
 
 USER fastapi
 

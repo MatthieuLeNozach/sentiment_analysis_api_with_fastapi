@@ -28,3 +28,10 @@ def get_task_info(task_id):
             "state": task.state,
         }
     return response
+
+
+from celery import shared_task
+
+@shared_task
+def dummy_task():
+    return "This is a dummy task."

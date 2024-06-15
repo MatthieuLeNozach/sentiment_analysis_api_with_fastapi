@@ -54,6 +54,8 @@ services:
     depends_on:
       - redis
       - postgres
+    ports:
+      - "6890:6899" 
 
   flower:
     image: mattjieujln/fastapi_sentiment:flower

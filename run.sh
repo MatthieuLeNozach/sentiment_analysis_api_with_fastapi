@@ -7,35 +7,24 @@ THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 #================================================================#
 #####################    ENV VARIABLES    ########################
 
-source .env/.dev-sample
-
-# export the contents of .env as environment variables
+# Function to load environment variables from [.env/.dev-sample]
 function try-load-dotenv {
-    if [ ! -f "$THIS_DIR/.env" ]; then
-        echo "no .env file found"
+    if [ ! -f "$THIS_DIR/.env/.dev-sample" ]; then
+        echo "no .env/.dev-sample file found"
         return 1
     fi
 
     while read -r line; do
         export "$line"
-    done < <(grep -v '^#' "$THIS_DIR/.env" | grep -v '^$')
+    done < <(grep -v '^#' "$THIS_DIR/.env/.dev-sample" | grep -v '^$')
 }
 
 #================================================================#
 ########################    DOCKER    ############################
 
 # Function to build a single Docker image
-build_image() {
+function build-image() {
     local target_dir="$1"
-
-    # Load environment variables from .env file
-    source "$THIS_DIR/.env/.dev-sample" || { echo "Failed to load environment variables from .env/.dev-sample"; return 1; }
-
-    # Check if DOCKERHUB_ACCOUNT and DOCKERHUB_REPO are set
-    if [ -z "$DOCKERHUB_ACCOUNT" ] || [ -z "$DOCKERHUB_REPO" ]; then
-        echo "DOCKERHUB_ACCOUNT and DOCKERHUB_REPO must be set in .env/.dev-sample"
-        return 1
-    fi
 
     # Get the name of the containing folder
     folder_name=$(basename "$target_dir")
@@ -50,8 +39,12 @@ build_image() {
         docker build --build-arg BASE_IMAGE="${DOCKERHUB_ACCOUNT}/${DOCKERHUB_REPO}:base" -t "${DOCKERHUB_ACCOUNT}/${DOCKERHUB_REPO}:${folder_name}" -f "$dockerfile_path" .
     fi
 }
+
 # Function to build all Docker images
-build_all() {
+function build-all() {
+    # Load environment variables
+    try-load-dotenv || { echo "Failed to load environment variables"; return 1; }
+
     # Define the target directories and whether they should be built from the base image
     declare -A target_dirs=(
         ["compose/fastapi-celery/base"]=false
@@ -64,28 +57,28 @@ build_all() {
     # Loop through the target directories and build the images
     for target_dir in "${!target_dirs[@]}"; do
         from_base="${target_dirs[$target_dir]}"
-        build_image "$THIS_DIR/$target_dir" "$from_base"
+        build-image "$THIS_DIR/$target_dir" "$from_base"
     done
 }
 
 # Function to push a single Docker image
-push_image() {
-    local service_dir=$1
-    local dockerhub_account=$2
-    local dockerhub_repo=$3
+function push-image() {
+    local service_dir="$1"
+
+    # Load environment variables
+    try-load-dotenv || { echo "Failed to load environment variables"; return 1; }
 
     # Get the name of the containing folder
     folder_name=$(basename "$service_dir")
 
     # Push the Docker image
-    docker push "${dockerhub_account}/${dockerhub_repo}:${folder_name}"
+    docker push "${DOCKERHUB_ACCOUNT}/${DOCKERHUB_REPO}:${folder_name}"
 }
 
-
 # Function to push all Docker images
-push_all_images() {
-    local dockerhub_account=$1
-    local dockerhub_repo=$2
+function push-all-images() {
+    # Load environment variables
+    try-load-dotenv || { echo "Failed to load environment variables"; return 1; }
 
     # Define the services and their corresponding Dockerfiles
     declare -A services
@@ -98,10 +91,36 @@ push_all_images() {
 
     # Loop through the services and push the images
     for service_dir in "${!services[@]}"; do
-        push_image "$service_dir" "$dockerhub_account" "$dockerhub_repo"
+        push-image "$THIS_DIR/$service_dir"
     done
 }
 
+
+#================================================================#
+#######################    DATABASE    ###########################
+
+function init-alembic() {
+    alembic init -t async alembic
+}
+
+function run-revision-postgres() {
+    try-load-dotenv || { echo "Failed to load environment variables"; return 1; }
+
+    # Start PostgreSQL service
+    docker compose up -d postgres
+
+    # Wait for PostgreSQL to be ready
+    until docker compose exec postgres pg_isready -U "$POSTGRES_USER" -h "$POSTGRES_HOST" -p "$POSTGRES_PORT"; do
+        >&2 echo "Waiting for PostgreSQL to become available..."
+        sleep 1
+    done
+
+    # Run Alembic revision in the web container
+    docker compose run web alembic revision --autogenerate 
+
+    # Stop all services
+    docker compose down
+}
 
 #================================================================#
 ########################    LINTING    ###########################
