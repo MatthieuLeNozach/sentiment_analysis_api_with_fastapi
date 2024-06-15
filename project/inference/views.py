@@ -1,7 +1,7 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import JSONResponse
 from celery.result import AsyncResult
-from project.users.tasks import run_regression
+from project.inference.tasks import run_regression
 from project.inference import inference_router
 
  

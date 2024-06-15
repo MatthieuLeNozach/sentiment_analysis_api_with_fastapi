@@ -11,6 +11,9 @@ logger = logging.getLogger(__name__)
 
 
 def create_app() -> FastAPI:
+    from project.logging import configure_logging
+    configure_logging()
+    
     app = FastAPI()
 
     from project.celery_utils import create_celery
@@ -23,7 +26,6 @@ def create_app() -> FastAPI:
         logger.info("creating the tables...")
         await create_db_and_tables()
 
-    # app.celery_app = create_celery()
 
     @app.get("/")
     async def root():
