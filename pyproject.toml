@@ -38,6 +38,7 @@ fastapi-cli = "^0.0.4"
 asyncpg = "^0.29.0"
 aiosqlite = "^0.20.0"
 sqladmin = "^0.17.0"
+kombu = "^5.3.7"
 
 [build-system]
 requires = ["poetry-core"]

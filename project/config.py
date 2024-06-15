@@ -29,7 +29,7 @@ class BaseConfig:
     DB_USER = os.environ.get("POSTGRES_USER", "postgres")
     DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD", "postgres")
     DB_HOST = os.environ.get("POSTGRES_HOST", "localhost")
-    DB_PORT = os.environ.get("POSTGRES_PORT", "5442")
+    DB_PORT = os.environ.get("POSTGRES_PORT", "5432")
     DB_NAME = os.environ.get("POSTGRES_DB", "postgres")
 
     DATABASE_URL: ClassVar[str] = (
@@ -58,17 +58,17 @@ class BaseConfig:
 
     CELERY_TASK_CREATE_MISSING_QUEUES: bool = False
 
-    # from kombu import Queue
-    # CELERY_TASK_QUEUES: list = (
-    #     Queue("default"),
-    #     Queue("high_priority"),
-    #     Queue("low_priority")
-    # )
-    # CELERY_TASK_ROUTES = {
-    #     "project.users.tasks.*": {
-    #         "queue": "high_priority",
-    #     },
-    # }
+    from kombu import Queue
+    CELERY_TASK_QUEUES: list = (
+        Queue("default"),
+        Queue("high_priority"),
+        Queue("low_priority")
+    )
+    CELERY_TASK_ROUTES = {
+        "project.users.tasks.*": {
+            "queue": "high_priority",
+        },
+    }
     CELERY_TASK_ROUTES = (route_task,)
 
 
